@@ -5,7 +5,7 @@ import { Meetup } from "@/app/types/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-type EventsHostedSectionProps = {
+type EventsSectionProps = {
     eventIds: string[] | undefined;
     sectionTitle: string;
 }
@@ -16,7 +16,7 @@ type CustomEvent = {
     date: number;
 }
 
-const EventsSection = ({ sectionTitle, eventIds }: EventsHostedSectionProps) => {
+const EventsSection = ({ sectionTitle, eventIds }: EventsSectionProps) => {
     const [eventData, setEventData] = useState<CustomEvent[]>()
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -87,6 +87,10 @@ const EventsSection = ({ sectionTitle, eventIds }: EventsHostedSectionProps) => 
                             </div>
                         </div>
                     ))}
+                    {
+                    (!eventData || eventData.length === 0) && 
+                    <p className="text-gray-400 lg:text-xl leading-relaxed text-center py-4 lg:py-10 select-none">No Events recorded yet</p>
+                    }
                 </div>
             </div>
         </>

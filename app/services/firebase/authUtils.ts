@@ -12,6 +12,7 @@ import {
   sendEmailVerification,
   signInWithEmailAndPassword,
   updatePassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -25,22 +26,28 @@ const checkIfUserRegistered = async (email: string) => {
 
     if (providers.length > 0) {
       if (providers.includes("google.com")) {
-        const err = new Error("User is already Registered with Google. Please Login using Google.") as Error & {code: string};
+        const err = new Error(
+          "User is already Registered with Google. Please Login using Google."
+        ) as Error & { code: string };
         err.code = CUSTOM_ERROR_CODES.USER_REGISTERRED_W_GOOGLE;
         throw err;
       } else if (providers.includes("password")) {
-        const err = new Error("User is already Registered with Google. Please Login using Email & Password.") as Error & {code: string};
+        const err = new Error(
+          "User is already Registered with Google. Please Login using Email & Password."
+        ) as Error & { code: string };
         err.code = CUSTOM_ERROR_CODES.USER_REGISTERRED_W_PASSWORD_EMAIL;
         throw err;
       }
-      const err = new Error("User is already Registered. Please Login.") as Error & {code: string};
+      const err = new Error(
+        "User is already Registered. Please Login."
+      ) as Error & { code: string };
       err.code = CUSTOM_ERROR_CODES.USER_REGISTERRED;
       throw err;
     }
   } catch (err) {
     throw err;
   }
-}
+};
 
 const handleLoginWithProvider = async (
   provider: AuthProvider,
@@ -181,7 +188,7 @@ export const registerUser = async (
 
     if (auth.currentUser) {
       await updateProfile(auth.currentUser, { displayName: name });
-      await sendEmailVerification(auth.currentUser)
+      await sendEmailVerification(auth.currentUser);
     }
 
     const userData: UserProfile = {
@@ -204,9 +211,12 @@ export const registerUser = async (
     await createUser(user.uid, userData);
   } catch (err: any) {
     if (err.code === CUSTOM_ERROR_CODES.EMAIL_IN_USE) {
-      err.message = "Email is already Registerred. Try to Login"
+      err.message = "Email is already Registerred. Try to Login";
     }
-    console.error("Failed to create User", ("code" in err ? err.code : err.message));
+    console.error(
+      "Failed to create User",
+      "code" in err ? err.code : err.message
+    );
     throw err;
   }
 };
@@ -219,9 +229,12 @@ export const loginUser = async (
     await signInWithEmailAndPassword(auth, email, password);
   } catch (err: any) {
     if (err.code === CUSTOM_ERROR_CODES.INVALID_CREDENTIALS) {
-      err.message = "Invalid Credentials"
+      err.message = "Invalid Credentials";
     }
-    console.error("Failed to login user",  ("code" in err ? err.code : err.message));
+    console.error(
+      "Failed to login user",
+      "code" in err ? err.code : err.message
+    );
     throw err;
   }
 };
@@ -239,6 +252,18 @@ export const updateUserPassword = async (
     await updatePassword(currentUser, newPassword);
   } catch (err) {
     console.error("Failed to update Password", err);
+    throw err;
+  }
+};
+
+export const forgotPassword = async (
+  email: string
+): Promise<void> => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    console.log("Password Reset Email sent")
+  } catch (err) {
+    console.error("Failed to send Password Reset email", err)
     throw err;
   }
 };

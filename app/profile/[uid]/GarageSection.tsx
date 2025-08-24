@@ -34,7 +34,7 @@ const GarageSection = ({ userId, onVehicleClick }: GarageSectionProps) => {
             return <Loader message="Loading Garage" />
         } else if (!vehicleData || vehicleData.length === 0) {
             return (
-                <div className="text-gray-400 text-xl leading-relaxed text-center py-10">
+                <div className="text-gray-400 lg:text-xl leading-relaxed text-center py-4 lg:py-10 select-none">
                     No vehicles in the Garage yet
                 </div>
             )

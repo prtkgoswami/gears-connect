@@ -7,6 +7,7 @@ import {
   fetchVehicles,
   updateVehicle,
 } from "../services/firebase/vehicleUtils";
+import { deleteImages } from "../services/cloudinary/uploadUtil";
 
 export const useFetchVehicles = (
   userId: string | undefined,
@@ -37,13 +38,20 @@ export const useFetchVehicle = (vehicleId: string) => {
 export const useUpdateVehicle = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       vehicleId,
       updatedData,
+      imageFilesToDelete
     }: {
       vehicleId: string;
       updatedData: Partial<Vehicle>;
-    }) => updateVehicle(vehicleId, updatedData),
+      imageFilesToDelete: string[];
+    }) => {
+      if (imageFilesToDelete.length > 0) {
+        await deleteImages(imageFilesToDelete)
+      }
+      await updateVehicle(vehicleId, updatedData)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     },

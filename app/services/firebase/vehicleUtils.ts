@@ -57,7 +57,7 @@ export const updateVehicle = async (
     const ref = doc(db, "vehicles", vehicleId);
     await updateDoc(ref, {
       ...data,
-      updateAt: Math.floor(Date.now() / 1000),
+      updatedAt: Math.floor(Date.now() / 1000),
     });
   } catch (err) {
     console.error(`Failed to update Vechicle (${vehicleId}): `, err);

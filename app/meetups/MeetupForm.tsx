@@ -10,7 +10,7 @@ import { useCreateMeetup, useUpdateMeetup } from "../hooks/meetupHooks";
 import { formatDateTimeLocal } from "./utils";
 import Loader from "../_components/Loader";
 
-type NewMeetupModalProps = {
+type MeetupFormProps = {
     isVisible: boolean;
     currentUser: User | null | undefined;
     initialValues?: Meetup;
@@ -18,14 +18,49 @@ type NewMeetupModalProps = {
     onClose: () => void;
 }
 
-const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "create", onClose }: NewMeetupModalProps) => {
+const MeetupForm = ({ isVisible, currentUser, initialValues, operation = "create", onClose }: MeetupFormProps) => {
     const [isPrivateCheck, setIsPrivateCheck] = useState(initialValues?.isPrivate ?? false);
     const [selectedTypes, setSelectedTypes] = useState<string[]>(initialValues?.vehicleTypes ?? [])
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({})
     const formRef = useRef<HTMLFormElement>(null);
     const modalBGRef = useRef(null)
     const options = useMemo(() => countryList().getData(), [])
     const { mutate: createMeetup, isPending: isPendingMeetupCreate } = useCreateMeetup(currentUser?.uid);
     const { mutate: updateMeetup, isPending: isPendingMeetupUpdate } = useUpdateMeetup()
+
+    const validateInputData = (data: Record<string, any>) => {
+        let isValid = true;
+        if (!data.title) {
+            setFormErrors(prev => ({ ...prev, title: "Title is Required" }))
+            isValid = false;
+        }
+        if (!data.description) {
+            setFormErrors(prev => ({ ...prev, description: "Description is Required" }))
+            isValid = false;
+        }
+        if (!data.venueAddress) {
+            setFormErrors(prev => ({ ...prev, venueAddress: "Address is Required" }))
+            isValid = false;
+        }
+        if (!data.venueCountry) {
+            setFormErrors(prev => ({ ...prev, venueCountry: "Country is Required" }))
+            isValid = false;
+        }
+        if (!data.venuePincode) {
+            setFormErrors(prev => ({ ...prev, venuePincode: "Pincode is Required" }))
+            isValid = false;
+        }
+        if (!data.dateTime) {
+            setFormErrors(prev => ({ ...prev, dateTime: "Date & Time is Required" }))
+            isValid = false;
+        }
+        if (!data.duration) {
+            setFormErrors(prev => ({ ...prev, duration: "Duration is Required" }))
+            isValid = false;
+        }
+
+        return isValid;
+    }
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -34,14 +69,16 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
         const data = Object.fromEntries(formData.entries())
         console.log('New Meetup Details', data)
 
-        if (!currentUser) {
+        const isValid = validateInputData(data);
+
+        if (!currentUser || !isValid) {
             return;
         }
 
         const newMeetup: Omit<Meetup, "id"> = {
             title: data.title as string ?? '',
             description: data.description as string ?? '',
-            date: Math.floor(new Date(data.date as string ?? '').getTime() / 1000),
+            date: Math.floor(new Date(data.dateTime as string ?? '').getTime() / 1000),
             duration: data.duration as string ?? '',
             venue: {
                 googleMapLink: data.venueGoogleMapLink as string ?? '',
@@ -125,6 +162,10 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
 
         window.addEventListener("click", handleClick);
 
+        if (isVisible) {
+            setFormErrors({});
+        }
+
         return () => {
             window.removeEventListener("click", handleClick);
         };
@@ -143,7 +184,7 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                     <FontAwesomeIcon icon={faClose} />
                 </div>
             </div>
-            <form ref={formRef} onSubmit={handleFormSubmit} className="flex flex-col gap-5 text-slate-800 px-2 xl:px-5">
+            <form ref={formRef} onSubmit={handleFormSubmit} className="flex flex-col gap-5 text-slate-800 px-2 xl:px-5" noValidate>
                 <label className="flex flex-col gap-1">
                     <div className="flex gap-1 items-start">
                         Title
@@ -157,6 +198,10 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                         required
                         defaultValue={initialValues?.title}
                     />
+                    {
+                        formErrors.title &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.title}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     <div className="flex gap-1 items-start">
@@ -171,6 +216,10 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                         required
                         defaultValue={initialValues?.description}
                     />
+                    {
+                        formErrors.description &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.description}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     <div className="flex gap-1 items-start">
@@ -184,6 +233,10 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                         required
                         defaultValue={initialValues?.venue.address}
                     />
+                    {
+                        formErrors.venueAddress &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.venueAddress}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     <div className="flex gap-1 items-start">
@@ -203,8 +256,12 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                         }}
                         defaultValue={options.find(
                             (opt: Record<string, string>) => opt.value === initialValues?.venue.country
-                          )}
+                        )}
                     />
+                    {
+                        formErrors.venueCountry &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.venueCountry}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     <div className="flex gap-1 items-start">
@@ -218,6 +275,10 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                         required
                         defaultValue={initialValues?.venue.pincode}
                     />
+                    {
+                        formErrors.venuePincode &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.venuePincode}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     Google Maps Link
@@ -236,12 +297,16 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                     </div>
                     <input
                         type="datetime-local"
-                        name="date"
+                        name="dateTime"
                         className="border-1 border-slate-800/30 px-2 py-1 rounded-sm"
                         required
                         min={getMinDateTime()}
                         defaultValue={initialValues?.date && formatDateTimeLocal(initialValues?.date)}
                     />
+                    {
+                        formErrors.dateTime &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.dateTime}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     <div className="flex gap-1 items-start">
@@ -256,6 +321,10 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                         required
                         defaultValue={initialValues?.duration}
                     />
+                    {
+                        formErrors.duration &&
+                        <p className="text-xs text-red-500 leading-relaxed italic text-right">ERROR: {formErrors.duration}</p>
+                    }
                 </label>
                 <label className="flex flex-col gap-1">
                     Rules (300 chars)
@@ -268,7 +337,7 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                     />
                 </label>
                 <label className="flex flex-col gap-1">
-                    Vehicle Types
+                    Allowed Vehicle Types
                     <div className="flex flex-wrap gap-4 w-full justify-center xl:justify-start">
                         {VEHICLE_TYPES.map(type => (
                             <label key={type} className="flex items-center gap-2">
@@ -335,21 +404,21 @@ const NewMeetupModal = ({ isVisible, currentUser, initialValues, operation = "cr
                 />
             </form>
 
-            
 
-        {isPendingMeetupCreate &&
-          <div className="fixed top-0 left-0 w-full h-full bg-black/80">
-            <Loader message="Creating Meetup" />
-          </div>
-        }
-        {isPendingMeetupUpdate &&
-          <div className="fixed top-0 left-0 w-full h-full bg-black/80">
-            <Loader message="Updating Meetup" />
-          </div>
-        }
+
+            {isPendingMeetupCreate &&
+                <div className="fixed top-0 left-0 w-full h-full bg-black/80">
+                    <Loader message="Creating Meetup" />
+                </div>
+            }
+            {isPendingMeetupUpdate &&
+                <div className="fixed top-0 left-0 w-full h-full bg-black/80">
+                    <Loader message="Updating Meetup" />
+                </div>
+            }
         </div>
     </div>)
 
 }
 
-export default NewMeetupModal;
+export default MeetupForm;

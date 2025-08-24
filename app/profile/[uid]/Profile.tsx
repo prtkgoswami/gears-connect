@@ -59,7 +59,7 @@ const Profile = ({ uid }: ProfileProps) => {
     }
 
     return (
-        <div className="w-full min-h-100 flex flex-col gap-5 px-5 xl:px-15">
+        <div className="w-full min-h-100 flex flex-col gap-5 px-2 xl:px-15">
             <div className="flex px-5 gap-5 flex-wrap mt-5 xl:mt-0">
                 <div className="flex flex-col gap-2 xl:p-10 w-full xl:w-2/3">
                     <p className="text-4xl">{profileData?.name}</p>

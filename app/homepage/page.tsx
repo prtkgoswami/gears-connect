@@ -38,7 +38,7 @@ const Homepage = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+            <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900`}>
                 {/* Hero Section */}
                 <section className="relative h-screen flex xl:items-center justify-center overflow-hidden">
                     {/* Background Pattern */}

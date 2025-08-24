@@ -3,7 +3,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import GarageItem from "./GarageItem";
-import NewVehicleModal from "./NewVehicleModal";
+import VehicleForm from "./VehicleForm";
 import VehicleDetail from "./VehicleDetail";
 import { useAuth } from "../hooks/authHooks";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import Loader from "../_components/Loader";
 import { ROUTES } from "../constants/path";
 import { Vehicle } from "../types/models";
 import { useFetchVehicles } from "../hooks/vehicleHooks";
+import TitleText from "../_components/TitleText";
 
 const Garage = () => {
   const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
@@ -82,7 +83,6 @@ const Garage = () => {
   }
 
   useEffect(() => {
-    console.log("Current User", currentUser, isLoggedIn)
     if (!isAuthLoading && !isLoggedIn) {
       router.push(ROUTES.root);
     }
@@ -104,9 +104,7 @@ const Garage = () => {
   return (
     <>
       <div className="w-full min-h-100 flex flex-col">
-        <div className="text-xl xl:text-3xl text-amber-300 uppercase select-none text-center leading-relaxed mb-4 xl:mb-5">
-          My Garage
-        </div>
+        <TitleText title="My Garage" options={{className: "mb-4 xl:mb-5"}} />
         {renderVehicleList()}
       </div>
 
@@ -117,7 +115,7 @@ const Garage = () => {
         <FontAwesomeIcon icon={faPlus} />
       </div>
 
-      <NewVehicleModal
+      <VehicleForm
         isVisible={showAddModal}
         onClose={handleModalCloseClick}
         currentUser={currentUser}

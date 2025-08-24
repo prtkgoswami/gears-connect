@@ -8,7 +8,8 @@ import { VEHICLE_ICON_MAP } from "../constants/variables";
 import { useDeleteVehicle, useFetchVehicle } from "../hooks/vehicleHooks";
 import Loader from "../_components/Loader";
 import ConfirmDialog from "../_components/ConfirmDialog";
-import NewVehicleModal from "./NewVehicleModal";
+import VehicleForm from "./VehicleForm";
+import FullScreenImageView from "../_components/FullScreenImageView";
 
 type VehicleDetailProps = {
   isVisible: boolean;
@@ -22,6 +23,7 @@ const VehicleDetail = ({ vehicleId, isVisible, currentUser, onClose, onVehicleDe
   const modalBGRef = useRef(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [imageToEnlarge, setImageToEnlarge] = useState<number | undefined>()
   const { data: vehicle, isLoading: isFetchingVehicleData, isError: isVehicleFetchingError } = useFetchVehicle(vehicleId);
   const { mutate: deleteVehicle, isPending: isPendingDelete } = useDeleteVehicle();
 
@@ -122,10 +124,10 @@ const VehicleDetail = ({ vehicleId, isVisible, currentUser, onClose, onVehicleDe
           </button>
         </div>
 
-        <div className="flex flex-col xl:flex-row gap-5 xl:gap-10 w-full border-1">
+        <div className="flex flex-col xl:flex-row gap-5 xl:gap-10 w-full">
           {
             (images && images.length > 0) ?
-              <div className="w-full xl:w-1/3 h-30 xl:h-72 relative">
+              <div className="w-full xl:w-1/3 h-30 xl:h-72 relative rounded-lg overflow-hidden">
                 <Image
                   src={images[0]}
                   alt="car"
@@ -179,26 +181,47 @@ const VehicleDetail = ({ vehicleId, isVisible, currentUser, onClose, onVehicleDe
                 }
               </div>
             }
-            <div className="text-gray-800 font-bold text-base xl:text-xl">Stock / Modified: {isModified ? 'Modified' : 'Stock'}</div>
+            <div className="text-gray-800 font-bold text-base xl:text-xl mt-2 xl:mt-0">Stock / Modified: {isModified ? 'Modified' : 'Stock'}</div>
           </div>
         </div>
 
-        <div className="flex flex-col w-full gap-5 px-2 xl:px-10 py-2">
-          <div className="flex flex-col gap-2">
-            <div className="text-gray-800 font-bold text-lg">Description</div>
-            <div className="text-gray-800 text-sm">{description}</div>
+        <div className="flex flex-col xl:flex-row px-2 xl:px-10 py-2 gap-5">
+          <div className="flex flex-col w-full gap-5 ">
+            <div className="flex flex-col gap-2">
+              <div className="text-gray-800 font-bold text-lg">Description</div>
+              <div className="text-gray-800 text-sm">{description}</div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="text-gray-800 font-bold text-lg">Modifications</div>
+              {modDescription ? (
+                <div className="text-gray-800 text-sm">
+                  {modDescription.split("\n").map((item, i) => (
+                    <div key={i}>{item}</div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-600 text-sm">No Modifications</div>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <div className="text-gray-800 font-bold text-lg">Modifications</div>
-            {modDescription ? (
-              <div className="text-gray-800 text-sm">
-                {modDescription.split("\n").map((item, i) => (
-                  <div key={i}>{item}</div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-gray-600 text-sm">No Modifications</div>
-            )}
+          <div className="w-full xl:w-1/2 pb-5 rounded-lg">
+            <p className="text-gray-800 font-bold text-lg mb-5">Gallery</p>
+            <div className="columns-2 gap-2 space-y-2">
+              {images?.map((imgSrc, i) => (
+                <div
+                  key={`gallery-car-${i}`}
+                  className="cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105"
+                  onClick={() => { setImageToEnlarge(i+1) }}>
+                  <Image
+                    src={imgSrc}
+                    alt={`car-${i}`}
+                    width={500}
+                    height={500}
+                    className="rounded-lg object-contain"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -217,13 +240,19 @@ const VehicleDetail = ({ vehicleId, isVisible, currentUser, onClose, onVehicleDe
         />
       </div>
 
-      <NewVehicleModal
+      <VehicleForm
         isVisible={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         currentUser={currentUser}
         operation="update"
         initialValues={vehicle}
       />
+
+      <FullScreenImageView
+        isVisible={!!imageToEnlarge}
+        imageUrlList={images}
+        defaultIndex={imageToEnlarge}
+        onClose={() => { setImageToEnlarge(undefined) }} />
     </div>
   );
 };

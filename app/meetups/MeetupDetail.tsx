@@ -11,7 +11,7 @@ import { ROUTES } from "../constants/path";
 import { useDeleteMeetup, useFetchMeetup } from "../hooks/meetupHooks";
 import Loader from "../_components/Loader";
 import ConfirmDialog from "../_components/ConfirmDialog";
-import NewMeetupModal from "./NewMeetupModal";
+import MeetupForm from "./MeetupForm";
 
 type MeetupDetailProps = {
   meetupId: string;
@@ -295,7 +295,7 @@ const MeetupDetail = ({ meetupId, isVisible, currentUser, onClose }: MeetupDetai
         />
       </div>
 
-      <NewMeetupModal
+      <MeetupForm
         isVisible={showUpdateModal}
         currentUser={currentUser}
         onClose={() => setShowUpdateModal(false)}

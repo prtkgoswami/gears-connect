@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import {
+  forgotPassword,
   loginUser,
   registerUser,
   updateUserPassword,
@@ -65,3 +66,11 @@ export const useUpdatePassword = () => {
     },
   });
 };
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: async({email}: {email: string}) => {
+      await forgotPassword(email)
+    }
+  })
+}

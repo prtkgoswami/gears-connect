@@ -26,7 +26,7 @@ export type Vehicle = {
   ownerName: string; // denormalized username
   make: string;
   model: string;
-  trim: string;
+  trim?: string;
   year: number;
   type: string; // "car, "bike, "plane, "boat"
   category?: string; // "vintage, "sports, "luxury"

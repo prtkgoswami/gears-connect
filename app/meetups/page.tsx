@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import MeetupDetail from "./MeetupDetail";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faL, faPlus } from "@fortawesome/free-solid-svg-icons";
-import NewMeetupModal from "./NewMeetupModal";
+import MeetupForm from "./MeetupForm";
 import { useAuth } from "../hooks/authHooks";
 import { useRouter } from "next/navigation";
 import Loader from "../_components/Loader";
@@ -16,13 +16,14 @@ import { VEHICLE_TYPES } from "../constants/variables";
 import { useFetchMeetups } from "../hooks/meetupHooks";
 import { useFetchUser } from "../hooks/userHooks";
 import { useFetchVehicles } from "../hooks/vehicleHooks";
+import TitleText from "../_components/TitleText";
 
 const RADIUS_OPTIONS = [5, 10, 20, 50, 100];
 
 const Meetups = () => {
   const [showMeetupDetail, setShowMeetupDetail] = useState(false);
   const [activeMeetupId, setActiveMeetupId] = useState<string>()
-  const [showNewMeetupModal, setShowNewMeetupModal] = useState(false);
+  const [showMeetupForm, setShowMeetupForm] = useState(false);
   const { data: meetupList, isLoading: isLoadingMeetupList, isError, error } = useFetchMeetups();
   const { isLoading: isAuthLoading, currentUser, isLoggedIn } = useAuth();
   const router = useRouter();
@@ -43,11 +44,11 @@ const Meetups = () => {
   }
 
   const handleNewMeetupClick = () => {
-    setShowNewMeetupModal(true)
+    setShowMeetupForm(true)
   }
 
   const handleNewMeetupCloseClick = () => {
-    setShowNewMeetupModal(false)
+    setShowMeetupForm(false)
   }
 
   const handleDetailClose = () => {
@@ -168,7 +169,7 @@ const Meetups = () => {
         }
       filteredMeetupList = filteredMeetupList.filter(({vehicleTypes}) => {
         const matches = vehicleData?.filter(({type}) => {
-          return vehicleTypes.includes(type)
+          return !vehicleTypes || vehicleTypes.length === 0 || vehicleTypes.includes(type)
         });
         return matches.length > 0;
       })
@@ -177,12 +178,10 @@ const Meetups = () => {
 
   return (
     <div className="w-full min-h-100 flex flex-col gap-5">
-      <h1 className="text-xl xl:text-3xl text-amber-300 uppercase select-none text-center leading-relaxed mb-4 xl:mb-5">
-        Meetup / Events
-      </h1>
+      <TitleText title="Meetup / Events" options={{className: "mb-4 xl:mb-5"}} />
 
       {/* Filters */}
-      <div className="mx-10 border border-white rounded-lg px-3 py-4 xl:p-5 relative flex gap-4 xl:gap-5 justify-center xl:justify-start items-end flex-wrap">
+      <div className="mx-10 border border-white rounded-lg px-3 py-4 xl:p-5 relative flex gap-4 xl:gap-5 justify- xl:justify-start items-end flex-wrap">
         <p className="absolute -top-3 left-3 bg-black px-5 text-sm xl:text-base">Filters</p>
         {/* Vehicle Type */}
         <div>
@@ -282,8 +281,8 @@ const Meetups = () => {
         <FontAwesomeIcon icon={faPlus} />
       </div>
 
-      <NewMeetupModal
-        isVisible={showNewMeetupModal}
+      <MeetupForm
+        isVisible={showMeetupForm}
         currentUser={currentUser}
         onClose={handleNewMeetupCloseClick}
         operation="create"
