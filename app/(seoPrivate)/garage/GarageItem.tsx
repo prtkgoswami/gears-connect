@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { Vehicle } from "../types/models";
+import { Vehicle } from "../../types/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VEHICLE_ICON_MAP } from "../constants/variables";
+import { VEHICLE_ICON_MAP } from "../../constants/variables";
 
 type GarageItemProp = {
   vehicle: Vehicle;

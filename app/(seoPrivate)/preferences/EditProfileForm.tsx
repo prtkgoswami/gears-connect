@@ -1,10 +1,11 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
-import Loader from "../_components/Loader";
-import { useUpdateUser } from "../hooks/userHooks";
-import { UserProfile } from "../types/models";
+import Loader from "../../_components/Loader";
+import { useUpdateUser } from "../../hooks/userHooks";
+import { UserProfile } from "../../types/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPen, faSave } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 type EditProfileFormProps = {
     isLoadingUserData: boolean;
@@ -35,10 +36,10 @@ const EditProfileForm = ({ userId, profileData, isLoadingUserData }: EditProfile
             {
                 onSuccess: () => {
                     setInEditMode(false);
-                    alert("User has been updated");
+                    toast.success("User has been updated");
                 },
                 onError: () => {
-                    alert("Failed to update user. Try again!")
+                    toast.error("Failed to update user. Try again!")
                 }
             }
         )

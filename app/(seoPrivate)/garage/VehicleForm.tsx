@@ -2,13 +2,14 @@
 import { faAsterisk, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
-import { Vehicle } from "../types/models";
+import { Vehicle } from "../../types/models";
 import { User } from "firebase/auth";
-import { VEHICLE_TYPES } from "../constants/variables";
-import { useCreateVehicle, useUpdateVehicle } from "../hooks/vehicleHooks";
-import Loader from "../_components/Loader";
-import { uploadImage } from "../services/cloudinary/uploadUtil";
+import { VEHICLE_TYPES } from "../../constants/variables";
+import { useCreateVehicle, useUpdateVehicle } from "../../hooks/vehicleHooks";
+import Loader from "../../_components/Loader";
+import { uploadImage } from "../../services/cloudinary/uploadUtil";
 import Image from "next/image";
+import { toast } from "react-toastify";
 
 const MAX_IMAGE_FILES = 5;
 
@@ -128,7 +129,7 @@ const VehicleForm = ({ isVisible, currentUser, onClose, initialValues, operation
         {
           onSuccess: () => onClose(),
           onError: () => {
-            alert("Failed to Add Vehicle. Try Again")
+            toast.error("Failed to Add Vehicle. Try Again")
           }
         }
       );
@@ -146,7 +147,7 @@ const VehicleForm = ({ isVisible, currentUser, onClose, initialValues, operation
         {
           onSuccess: () => onClose(),
           onError: () => {
-            alert("Failed to Update Vehicle. Try Again")
+            toast.error("Failed to Update Vehicle. Try Again")
           }
         }
       )

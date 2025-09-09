@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { db } from "@/app/lib/firebase";
 import { Meetup } from "@/app/types/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretRight, faLock } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 type EventsSectionProps = {
     eventIds: string[] | undefined;
     sectionTitle: string;
+    isUserLoggedIn: boolean;
 }
 
 type CustomEvent = {
@@ -16,7 +18,7 @@ type CustomEvent = {
     date: number;
 }
 
-const EventsSection = ({ sectionTitle, eventIds }: EventsSectionProps) => {
+const EventsSection = ({ sectionTitle, eventIds, isUserLoggedIn }: EventsSectionProps) => {
     const [eventData, setEventData] = useState<CustomEvent[]>()
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -41,7 +43,7 @@ const EventsSection = ({ sectionTitle, eventIds }: EventsSectionProps) => {
             setEventData(eventList);
         } catch (err) {
             console.log('Failed to fetch Event details', err);
-            alert('Failed to fetch event details. Try Again.')
+            toast.error('Failed to fetch event details. Try Again.')
         }
     }
 
@@ -60,7 +62,7 @@ const EventsSection = ({ sectionTitle, eventIds }: EventsSectionProps) => {
     }
 
     useEffect(() => {
-        if (eventIds && eventIds.length > 0) {
+        if (eventIds && eventIds.length > 0 && isUserLoggedIn) {
             void fetchEventDetails(eventIds)
         }
     }, [eventIds])
@@ -75,23 +77,29 @@ const EventsSection = ({ sectionTitle, eventIds }: EventsSectionProps) => {
                 <div className="text-amber-300 text-xl xl:text-2xl leading-relaxed uppercase">{sectionTitle}</div>
             </div>
             <div className={`transition-all origin-top duration-300 ease-out ${isExpanded ? 'scale-y-100 xl:max-h-[600px] xl:overflow-y-auto' : 'scale-y-0 max-h-0 overflow-y-hidden'}`}>
-                <div className="flex flex-col xl:items-center gap-4 xl:px-5 mt-5 xl:mt-0">
-                    {eventData?.map(({ id, title, date }, idx) => (
-                        <div key={idx} className="flex justify-between gap-1 w-full xl:w-1/2 border px-2 xl:px-5 py-2 rounded-lg">
-                            <div className="flex flex-col flex-1 gap-1 min-w-0 xl:gap-2 w-fit">
-                                <p className="leading-relaxed font-semibold truncate whitespace-nowrap w-full">{title}</p>
-                                <p className="leading-relaxed font-light italic text-xs xl:text-base">Event ID: {id}</p>
+                {isUserLoggedIn ?
+                    <div className="flex flex-col xl:items-center gap-4 xl:px-5 mt-5 xl:mt-0">
+                        {eventData?.map(({ id, title, date }, idx) => (
+                            <div key={idx} className="flex justify-between gap-1 w-full xl:w-1/2 border px-2 xl:px-5 py-2 rounded-lg">
+                                <div className="flex flex-col flex-1 gap-1 min-w-0 xl:gap-2 w-fit">
+                                    <p className="leading-relaxed font-semibold truncate whitespace-nowrap w-full">{title}</p>
+                                    <p className="leading-relaxed font-light italic text-xs xl:text-base">Event ID: {id}</p>
+                                </div>
+                                <div>
+                                    {renderDatelabel(date)}
+                                </div>
                             </div>
-                            <div>
-                                {renderDatelabel(date)}
-                            </div>
-                        </div>
-                    ))}
-                    {
-                    (!eventData || eventData.length === 0) && 
-                    <p className="text-gray-400 lg:text-xl leading-relaxed text-center py-4 lg:py-10 select-none">No Events recorded yet</p>
-                    }
-                </div>
+                        ))}
+                        {
+                            (!eventData || eventData.length === 0) &&
+                            <p className="text-gray-400 lg:text-xl leading-relaxed text-center py-4 lg:py-10 select-none">No Events recorded yet</p>
+                        }
+                    </div> :
+                    <div className="flex flex-col gap-2 pt-5 items-center justify-center">
+                        <FontAwesomeIcon icon={faLock} size={'4x'} />
+                        <span>Please Register to see more</span>
+                    </div>
+                }
             </div>
         </>
     )

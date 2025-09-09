@@ -14,6 +14,7 @@ import {
   where,
 } from "firebase/firestore";
 
+// Fetch All Meetup Details 
 export const fetchMeetups = async (): Promise<Meetup[]> => {
   try {
     const q = query(
@@ -31,6 +32,7 @@ export const fetchMeetups = async (): Promise<Meetup[]> => {
   }
 };
 
+// Fetch Meetup Details by ID List
 export const fetchMeetupList = async (
   meetupIds: string[]
 ): Promise<Meetup[]> => {
@@ -50,6 +52,7 @@ export const fetchMeetupList = async (
   }
 };
 
+// Fetch Meetup Details by ID
 export const fetchMeetup = async (meetupId: string): Promise<Meetup> => {
   try {
     const ref = doc(db, "meetups", meetupId);

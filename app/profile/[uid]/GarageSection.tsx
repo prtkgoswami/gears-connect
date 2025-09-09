@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import GarageItem from "../../garage/GarageItem";
+import GarageItem from "../../(seoPrivate)/garage/GarageItem";
 import { Vehicle } from "@/app/types/models";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretRight, faLock } from "@fortawesome/free-solid-svg-icons";
 import { useFetchVehicles } from "@/app/hooks/vehicleHooks";
 import Loader from "@/app/_components/Loader";
 
 type GarageSectionProps = {
     userId?: string;
     onVehicleClick: (vehicle: Vehicle) => void;
+    isUserLoggedIn: boolean;
 }
-const GarageSection = ({ userId, onVehicleClick }: GarageSectionProps) => {
+
+const GarageSection = ({ userId, onVehicleClick, isUserLoggedIn }: GarageSectionProps) => {
     const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
     const [isExpanded, setIsExpanded] = useState(false);
     const [activeType, setActiveType] = useState('');
@@ -22,7 +24,7 @@ const GarageSection = ({ userId, onVehicleClick }: GarageSectionProps) => {
         isError: isVehicleFetchError,
         error: vehicleFetchError
     } = useFetchVehicles(userId, {
-        enabled: !!userId
+        enabled: !!userId && isUserLoggedIn
     });
 
     const onSectionClick = () => {
@@ -30,7 +32,14 @@ const GarageSection = ({ userId, onVehicleClick }: GarageSectionProps) => {
     }
 
     const renderVehicles = () => {
-        if (isLoadingVehicles) {
+        if (!isUserLoggedIn) {
+            return (
+                <div className="flex flex-col gap-2 pt-5 items-center justify-center">
+                    <FontAwesomeIcon icon={faLock} size={'4x'} />
+                    <span>Please Register to see more</span>
+                </div>
+            )
+        } else if (isLoadingVehicles) {
             return <Loader message="Loading Garage" />
         } else if (!vehicleData || vehicleData.length === 0) {
             return (

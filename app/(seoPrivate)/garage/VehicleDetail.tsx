@@ -4,12 +4,13 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
 import { User } from "firebase/auth";
-import { VEHICLE_ICON_MAP } from "../constants/variables";
-import { useDeleteVehicle, useFetchVehicle } from "../hooks/vehicleHooks";
-import Loader from "../_components/Loader";
-import ConfirmDialog from "../_components/ConfirmDialog";
+import { VEHICLE_ICON_MAP } from "../../constants/variables";
+import { useDeleteVehicle, useFetchVehicle } from "../../hooks/vehicleHooks";
+import Loader from "../../_components/Loader";
+import ConfirmDialog from "../../_components/ConfirmDialog";
 import VehicleForm from "./VehicleForm";
-import FullScreenImageView from "../_components/FullScreenImageView";
+import FullScreenImageView from "../../_components/FullScreenImageView";
+import { toast } from "react-toastify";
 
 type VehicleDetailProps = {
   isVisible: boolean;
@@ -49,7 +50,7 @@ const VehicleDetail = ({ vehicleId, isVisible, currentUser, onClose, onVehicleDe
       { vehicleId }, {
       onSuccess: () => onClose(),
       onError: (err) => {
-        alert('Failed to Delete Vehicle. Try Again')
+        toast.error('Failed to Delete Vehicle. Try Again')
       }
     }
     );

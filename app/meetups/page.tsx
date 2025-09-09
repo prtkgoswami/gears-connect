@@ -1,33 +1,27 @@
 "use client";
 import { useEffect, useState } from "react";
-import MeetupDetail from "./MeetupDetail";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faL, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import MeetupForm from "./MeetupForm";
 import { useAuth } from "../hooks/authHooks";
 import { useRouter } from "next/navigation";
 import Loader from "../_components/Loader";
 import { ROUTES } from "../constants/path";
-import { Meetup, Vehicle } from "../types/models";
+import { Meetup } from "../types/models";
 import { formatDisplayDate } from "./utils";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../lib/firebase";
 import { VEHICLE_TYPES } from "../constants/variables";
 import { useFetchMeetups } from "../hooks/meetupHooks";
-import { useFetchUser } from "../hooks/userHooks";
 import { useFetchVehicles } from "../hooks/vehicleHooks";
 import TitleText from "../_components/TitleText";
-
-const RADIUS_OPTIONS = [5, 10, 20, 50, 100];
+import { toast } from "react-toastify";
 
 const Meetups = () => {
-  const [showMeetupDetail, setShowMeetupDetail] = useState(false);
-  const [activeMeetupId, setActiveMeetupId] = useState<string>()
   const [showMeetupForm, setShowMeetupForm] = useState(false);
   const { data: meetupList, isLoading: isLoadingMeetupList, isError, error } = useFetchMeetups();
-  const { isLoading: isAuthLoading, currentUser, isLoggedIn } = useAuth();
+  const { currentUser } = useAuth();
   const router = useRouter();
   const { data: vehicleData, isLoading: isLoadingVehicles } = useFetchVehicles(currentUser?.uid)
+  console.log('meetups', meetupList, currentUser)
 
   // Filters
   const [activeType, setActiveType] = useState('all')
@@ -36,11 +30,8 @@ const Meetups = () => {
   const [activeWeekendOnly, setActiveWeekendOnly] = useState(false)
   const [activeEligibleOnly, setActiveEligibleOnly] = useState(false)
 
-
-
   const handleMeetupClick = (meetup: Meetup) => {
-    setActiveMeetupId(meetup.id);
-    setShowMeetupDetail(true);
+    router.push(`${ROUTES.meetups}/${meetup.id}`)
   }
 
   const handleNewMeetupClick = () => {
@@ -49,10 +40,6 @@ const Meetups = () => {
 
   const handleNewMeetupCloseClick = () => {
     setShowMeetupForm(false)
-  }
-
-  const handleDetailClose = () => {
-    setShowMeetupDetail(false);
   }
 
   const handleResetFilters = () => {
@@ -72,7 +59,7 @@ const Meetups = () => {
       return (
         <div className="text-gray-400 text-xl leading-relaxed text-center mb-20 flex-1 flex justify-center items-center">
           No Meetups/Events found.
-          <>{isError && alert("Failed to Fetch Meetups. Please try again!")}</>
+          <>{isError && toast.error("Failed to Fetch Meetups. Please try again!")}</>
         </div>
       )
     } else {
@@ -81,7 +68,7 @@ const Meetups = () => {
           <p className="mb-5 text-right text-xs xl:text-base">{filteredMeetupList.length} {filteredMeetupList.length === 1 ? 'Event' : 'Events'} Found</p>
           <div className="grid grid-cols-2 xl:grid-cols-5 gap-3">
             {filteredMeetupList.map((meetup, index) => {
-              const isMeetupFull = meetup.participants.length === meetup.participationLimit;
+              const isMeetupFull = meetup.participantCount === meetup.participationLimit;
               return (
                 <div
                   key={index}
@@ -102,7 +89,7 @@ const Meetups = () => {
                       <strong>Duration:</strong> {meetup.duration}
                     </div>
                     <div>
-                      <strong>Participants:</strong> {meetup.participants.length}
+                      <strong>Participants:</strong> {meetup.participantCount}
                     </div>
                   </div>
 
@@ -135,16 +122,6 @@ const Meetups = () => {
     }
   }
 
-  useEffect(() => {
-    if (!isAuthLoading && (!isLoggedIn || !currentUser)) {
-      router.push(ROUTES.root);
-    }
-  }, [isLoggedIn, currentUser, isAuthLoading])
-
-  if (isAuthLoading) {
-    return <Loader message="Checking Authorization..." />
-  }
-
   let filteredMeetupList = meetupList;
   if (filteredMeetupList && filteredMeetupList.length > 0) {
     if (activeType && activeType !== 'all') {
@@ -155,7 +132,7 @@ const Meetups = () => {
       filteredMeetupList = filteredMeetupList.filter(({ isPrivate }) => isPrivate === privateOnly)
     }
     if (activeAvailableOnly) {
-      filteredMeetupList = filteredMeetupList.filter(({ participants, participationLimit }) => participants.length < participationLimit)
+      filteredMeetupList = filteredMeetupList.filter(({ participantCount, participationLimit }) => (participantCount ?? 0) < participationLimit)
     }
     if (activeWeekendOnly) {
       filteredMeetupList = filteredMeetupList.filter(({ date }) => {
@@ -211,29 +188,6 @@ const Meetups = () => {
             )}
           </select>
         </div>
-        {/* Distance */}
-        {/* <div>
-          <p className="text-amber-300 mb-1 leading-relaxed" style={{ fontSize: '0.65rem' }}>Distance</p>
-          <div className="flex gap-3">
-            <label className="flex gap-2 items-center">
-              Pincode
-              <input type="text" maxLength={10} className="w-24 py-1 px-2 border border-amber-300 rounded-lg focus:outline-none" />
-            </label>
-            <label className="flex gap-2 items-center">
-              Radius
-              <select
-                className="border border-amber-300 rounded-lg px-5 py-2 capitalize"
-                onChange={(e) => setActiveExclusivity(e.currentTarget.value)}>
-                <option value="" className="capitalize text-gray-700 hover:text-gray-900">None</option>
-                {RADIUS_OPTIONS.map(r =>
-                  <option key={`radius-${r}`} value="${r}" className="capitalize text-gray-700 hover:text-gray-900">
-                    {r} km
-                  </option>
-                )}
-              </select>
-            </label>
-          </div>
-        </div> */}
         {/* Eligible Only */}
         <div className="pb-2">
           <label className="flex gap-1 xl:gap-2">
@@ -265,14 +219,6 @@ const Meetups = () => {
       </div>
 
       {renderMeetupList()}
-
-      {activeMeetupId && activeMeetupId !== '' &&
-        <MeetupDetail
-          isVisible={showMeetupDetail}
-          meetupId={activeMeetupId}
-          onClose={handleDetailClose}
-          currentUser={currentUser} />
-      }
 
       <div
         className="fixed bottom-10 right-10 bg-amber-300/80 text-gray-900 rounded-md p-2 text-3xl transition-all ease-in-out duration-150 hover:bg-amber-300/100 hover:scale-110 cursor-pointer"

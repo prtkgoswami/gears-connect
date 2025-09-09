@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import GarageItem from "./GarageItem";
 import VehicleForm from "./VehicleForm";
 import VehicleDetail from "./VehicleDetail";
-import { useAuth } from "../hooks/authHooks";
+import { useAuth } from "../../hooks/authHooks";
 import { useRouter } from "next/navigation";
-import Loader from "../_components/Loader";
-import { ROUTES } from "../constants/path";
-import { Vehicle } from "../types/models";
-import { useFetchVehicles } from "../hooks/vehicleHooks";
-import TitleText from "../_components/TitleText";
+import Loader from "../../_components/Loader";
+import { ROUTES } from "../../constants/path";
+import { Vehicle } from "../../types/models";
+import { useFetchVehicles } from "../../hooks/vehicleHooks";
+import TitleText from "../../_components/TitleText";
+import { toast } from "react-toastify";
 
 const Garage = () => {
   const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
@@ -52,7 +53,7 @@ const Garage = () => {
       return (
         <div className="text-gray-400 text-xl leading-relaxed text-center mb-20 flex-1 flex justify-center items-center">
           No vehicles in the Garage yet
-          <>{isVehicleFetchError && alert('Failed to Fetch Vehicles. Please try again!')}</>
+          <>{isVehicleFetchError && toast.error('Failed to Fetch Vehicles. Please try again!')}</>
         </div>
       )
     } else {
@@ -104,7 +105,7 @@ const Garage = () => {
   return (
     <>
       <div className="w-full min-h-100 flex flex-col">
-        <TitleText title="My Garage" options={{className: "mb-4 xl:mb-5"}} />
+        <TitleText title="My Garage" options={{ className: "mb-4 xl:mb-5" }} />
         {renderVehicleList()}
       </div>
 

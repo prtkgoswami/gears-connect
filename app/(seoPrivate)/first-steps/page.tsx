@@ -1,24 +1,27 @@
 "use client"
 import { faCar, faFlagCheckered, faPlus, faRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRouter } from "next/navigation";
-import { ROUTES } from "../constants/path";
-import { useAuth } from "../hooks/authHooks";
-import Loader from "../_components/Loader";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ROUTES } from "../../constants/path";
+import { useAuth } from "../../hooks/authHooks";
+import Loader from "../../_components/Loader";
 import { useEffect, useRef, useState } from "react";
-import { UserProfile } from "../types/models";
+import { UserProfile } from "../../types/models";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../../lib/firebase";
 import { User } from "firebase/auth";
-import { APP_NAME } from "../constants/variables";
-import { useUpdateUser } from "../hooks/userHooks";
+import { APP_NAME } from "../../constants/variables";
+import { useUpdateUser } from "../../hooks/userHooks";
+import { toast } from "react-toastify";
 
 const FirstSteps = () => {
     const { isLoading: isAuthLoading, currentUser, isLoggedIn } = useAuth();
     const [userData, setUserData] = useState<UserProfile>();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const formRef = useRef<HTMLFormElement>(null);
     const { mutate: updateUser, isPending, isError, error } = useUpdateUser();
+    const successRoute = searchParams.get('redirect') ?? ROUTES.garage;
 
     const handleGetStarted = () => {
         if (formRef.current) {
@@ -49,8 +52,13 @@ const FirstSteps = () => {
             userId: currentUser?.uid,
             data: updatedData
         }, {
-            onSuccess: () => router.push(ROUTES.garage),
-            onError: (err) => () => alert("Failed to update User Profile. Try Again")
+            onSuccess: () => {
+                if (successRoute.startsWith(ROUTES.garage) || successRoute.startsWith(ROUTES.meetups))
+                    router.push(successRoute)
+                else
+                    router.push(ROUTES.garage)
+            },
+            onError: (err) => () => toast.error("Failed to update User Profile. Try Again")
         })
     }
 

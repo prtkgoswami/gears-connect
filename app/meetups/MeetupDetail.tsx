@@ -12,6 +12,7 @@ import { useDeleteMeetup, useFetchMeetup } from "../hooks/meetupHooks";
 import Loader from "../_components/Loader";
 import ConfirmDialog from "../_components/ConfirmDialog";
 import MeetupForm from "./MeetupForm";
+import { toast } from "react-toastify";
 
 type MeetupDetailProps = {
   meetupId: string;
@@ -54,7 +55,7 @@ const MeetupDetail = ({ meetupId, isVisible, currentUser, onClose }: MeetupDetai
       {
         onSuccess: () => onClose(),
         onError: () => {
-          alert("Failed to delete Meetup. Try Again!")
+          toast.error("Failed to delete Meetup. Try Again!")
         }
       }
     )
@@ -104,11 +105,12 @@ const MeetupDetail = ({ meetupId, isVisible, currentUser, onClose }: MeetupDetai
     vehicleTypes,
     tags,
     participants,
-    organizer
+    organizer,
+    participantCount
   } = meetup;
 
   const isAttending = participants && participants.filter(({ userId }) => userId === currentUser?.uid).length > 0 || false;
-  const isFull = participants && participants.length === participationLimit || false;
+  const isFull = participants && participantCount === participationLimit || false;
   const isOwner = organizer === currentUser?.uid;
 
   return (
@@ -244,28 +246,30 @@ const MeetupDetail = ({ meetupId, isVisible, currentUser, onClose }: MeetupDetai
                 </a>
               </div>
             </div>
-            <div className="flex flex-col w-full xl:w-1/3 text-gray-800 border-t xl:border-2 xl:rounded-lg py-5 xl:p-2 h-full overflow-y-auto">
-              <div className="text-lg font-semibold xl:text-2xl xl:font-normal mb-5">Participants</div>
-              {(participants && participants.length > 0) ?
-                <ol className="flex flex-col gap-5 list-decimal list-inside" type="1">
-                  {participants.map((participant, i) => (
-                    <Link href={`${ROUTES.profile}/${participant.userId}`} key={`paticipant-${i}`}>
-                      <li>
-                        {participant.username}
-                        <div className="flex flex-col">
-                          {
-                            participant.vehicles.map(({ name }, i2) => {
-                              return <div key={`vehicle-${i2}`} className="ml-10">{name}</div>
-                            })
-                          }
-                        </div>
-                      </li>
-                    </Link>
-                  ))}
-                </ol> :
-                <div className="text-lg text-gray-600 leading-relaxed">No Participants Yet</div>
-              }
-            </div>
+            {participants &&
+              <div className="flex flex-col w-full xl:w-1/3 text-gray-800 border-t xl:border-2 xl:rounded-lg py-5 xl:p-2 h-full overflow-y-auto">
+                <div className="text-lg font-semibold xl:text-2xl xl:font-normal mb-5">Participants</div>
+                {(participants && participantCount && participantCount > 0) ?
+                  <ol className="flex flex-col gap-5 list-decimal list-inside" type="1">
+                    {participants.map((participant, i) => (
+                      <Link href={`${ROUTES.profile}/${participant.userId}`} key={`paticipant-${i}`}>
+                        <li>
+                          {participant.username}
+                          <div className="flex flex-col">
+                            {
+                              participant.vehicles.map(({ name }, i2) => {
+                                return <div key={`vehicle-${i2}`} className="ml-10">{name}</div>
+                              })
+                            }
+                          </div>
+                        </li>
+                      </Link>
+                    ))}
+                  </ol> :
+                  <div className="text-lg text-gray-600 leading-relaxed">No Participants Yet</div>
+                }
+              </div>
+            }
           </div>
         </div>
 
@@ -287,7 +291,7 @@ const MeetupDetail = ({ meetupId, isVisible, currentUser, onClose }: MeetupDetai
         }
 
         <ConfirmDialog
-          message={participants.length > 0 ? `The event has ${participants.length} ${participants.length > 1 ? 'participants' : 'participant'}. Are you sure you want to delete?` : "Are you sure you want to delete?"}
+          message={(participantCount && participantCount > 0) ? `The event has ${participantCount} ${participantCount > 1 ? 'participants' : 'participant'}. Are you sure you want to delete?` : "Are you sure you want to delete?"}
           isVisible={showConfirmModal}
           onCancel={() => setShowConfirmModal(false)}
           onConfirm={() => confirmDeleteClick()}

@@ -1,19 +1,18 @@
 "use client"
-import { useState } from "react";
-import Loader from "../_components/Loader";
-import { useAuth, useForgotPassword } from "../hooks/authHooks";
-import { useFetchUser } from "../hooks/userHooks";
+import Loader from "../../_components/Loader";
+import { useAuth, useForgotPassword } from "../../hooks/authHooks";
+import { useFetchUser } from "../../hooks/userHooks";
 import EditProfileForm from "./EditProfileForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import TitleText from "../_components/TitleText";
+import TitleText from "../../_components/TitleText";
+import { toast } from "react-toastify";
 
 const PreferencesPage = () => {
     const { isLoading: isAuthLoading, currentUser, isLoggedIn } = useAuth();
     const userId = currentUser?.uid
     const { data: profileData, isLoading: isLoadingUserData, isError: isUserFetchError } = useFetchUser(userId)
     const { mutate: resetPassword, isPending: isPendingEmailSend } = useForgotPassword();
-    const [resetEmailSuccess, setResetEmailSuccess] = useState(false)
 
     const handleResetPasswordClick = () => {
         if (profileData && profileData.email) {
@@ -21,10 +20,10 @@ const PreferencesPage = () => {
                 email: profileData.email
             }, {
                 onSuccess: () => {
-                    setResetEmailSuccess(true);
+                    toast.success("Reset email send to your Email")
                 },
                 onError: () => {
-                    alert('Reset email could not be sent')
+                    toast.error('Reset email could not be sent')
                 }
             })
         }
@@ -33,9 +32,6 @@ const PreferencesPage = () => {
     const renderResetEmailButtonLabel = () => {
         if (isPendingEmailSend) {
             return <p className="flex gap-1 justify-center">Sending <FontAwesomeIcon icon={faSpinner} spinPulse /></p>
-        }
-        if (resetEmailSuccess) {
-            return <>Email Sent</>
         }
 
         return <>Reset Password</>
@@ -68,9 +64,8 @@ const PreferencesPage = () => {
                     </div>
                 </div>
             </div>
-
         </div>
-    )
+    );
 }
 
 export default PreferencesPage;

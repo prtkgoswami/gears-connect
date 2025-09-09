@@ -9,8 +9,7 @@ type AccountParams = {
 
 const Account = ({ params }: AccountParams) => {
     const unwrappedParams = React.use(params);
-    const queryUid = unwrappedParams.uid
-    const userId = queryUid;
+    const userId = unwrappedParams.uid
 
     return (
         <Profile uid={userId} />

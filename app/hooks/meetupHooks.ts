@@ -1,6 +1,5 @@
 import {
   useMutation,
-  UseMutationOptions,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -8,33 +7,35 @@ import { Meetup } from "../types/models";
 import {
   createMeetup,
   deleteMeetup,
-  fetchMeetup,
-  fetchMeetupList,
-  fetchMeetups,
   updateMeetup,
 } from "../services/firebase/meetupUtils";
 import { updateUser } from "../services/firebase/userUtils";
 import { arrayUnion, increment, UpdateData } from "firebase/firestore";
+import { fetchMeetup, fetchMeetupList, fetchMeetups } from "../lib/api";
+import { useAuth } from "@/app/hooks/authHooks";
 
 export const useFetchMeetups = () => {
+  const { isLoading } = useAuth();
+
   return useQuery<Meetup[]>({
     queryKey: ["meetups"],
-    queryFn: async () => fetchMeetups(),
+    queryFn: fetchMeetups,
+    enabled: !isLoading, // wait for Firebase auth
   });
 };
 
 export const useFetchMeetupList = (meetupIds: string[]) => {
+  const { isLoading } = useAuth();
   const queryClient = useQueryClient();
 
   return useQuery<Meetup[]>({
     queryKey: ["meetups", meetupIds],
-    queryFn: async () => fetchMeetupList(meetupIds),
+    queryFn: () => fetchMeetupList(meetupIds),
+    enabled: !isLoading && meetupIds.length > 0, // wait + avoid empty calls
     initialData: () => {
-      // Try to hydrate from full meetups cache
       const all = queryClient.getQueryData<Meetup[]>(["meetups"]);
       if (!all) return undefined;
 
-      // Return only those meetups that match
       const subset = all.filter((m) => meetupIds.includes(m.id));
       return subset.length > 0 ? subset : undefined;
     },
@@ -42,18 +43,21 @@ export const useFetchMeetupList = (meetupIds: string[]) => {
 };
 
 export const useFetchMeetup = (meetupId: string) => {
+  const { isLoading } = useAuth();
   const queryClient = useQueryClient();
 
   return useQuery<Meetup>({
     queryKey: ["meetups", meetupId],
     queryFn: () => fetchMeetup(meetupId),
-    initialData: () => {
-      return queryClient
-        .getQueryData<Meetup[]>(["meetups"])
-        ?.find((m) => m.id === meetupId);
-    },
+    enabled: !isLoading && !!meetupId, // wait + ensure id exists
+    // initialData: () => {
+    //   return  queryClient
+    //     .getQueryData<Meetup[]>(["meetups"])
+    //     ?.find((m) => m.id === meetupId);
+    // },
   });
 };
+
 
 type UpdateMeetupInput = {
   meetupId: string;

@@ -18,12 +18,14 @@
     "@tanstack/react-query-devtools": "^5.85.3",
     "cloudinary": "^2.7.0",
     "firebase": "^12.1.0",
+    "firebase-admin": "^13.5.0",
     "gsap": "^3.13.0",
     "next": "15.4.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-select": "^5.10.2",
-    "react-select-country-list": "^2.2.3"
+    "react-select-country-list": "^2.2.3",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

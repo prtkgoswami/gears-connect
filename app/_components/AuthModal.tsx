@@ -11,9 +11,10 @@ type AuthModalProps = {
     isVisible: boolean;
     onClose: () => void;
     defaultMode: 'signup' | 'login';
+    redirectUrl?: string;
 }
 
-const AuthModal = ({ isVisible, onClose, defaultMode }: AuthModalProps) => {
+const AuthModal = ({ isVisible, onClose, defaultMode, redirectUrl }: AuthModalProps) => {
     const [mode, setMode] = useState<'signup' | 'login' | 'forgotPassword'>(defaultMode);
     const [isLoading, setIsLoading] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
@@ -42,11 +43,13 @@ const AuthModal = ({ isVisible, onClose, defaultMode }: AuthModalProps) => {
     }, [isVisible, onClose]);
 
     const goToGarage = () => {
-        router.push(ROUTES.garage);
+        const redirectPath = redirectUrl ?? ROUTES.garage;
+        router.push(redirectPath);
     }
 
     const goToOnboarding = () => {
-        router.push(ROUTES.onboarding);
+        const redirectPath = redirectUrl ?? ROUTES.onboarding;
+        router.push(redirectPath);
     }
 
     const onGoogleLogin = async () => {

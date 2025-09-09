@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
-import GarageItem from "../../garage/GarageItem";
-import VehicleDetail from "../../garage/VehicleDetail";
+import GarageItem from "../../(seoPrivate)/garage/GarageItem";
+import VehicleDetail from "../../(seoPrivate)/garage/VehicleDetail";
 import { useAuth } from "../../hooks/authHooks";
 import Loader from "../../_components/Loader";
 import { useRouter } from "next/navigation";
@@ -42,16 +42,6 @@ const Profile = ({ uid }: ProfileProps) => {
 
     const handleDetailCloseClick = () => {
         setActiveVehicle(undefined);
-    }
-
-    useEffect(() => {
-        if (!isAuthLoading && !isLoggedIn) {
-            router.push(ROUTES.root);
-        }
-    }, [isLoggedIn, currentUser, isAuthLoading])
-
-    if (isAuthLoading) {
-        return <Loader message="Checking Authorization..." />
     }
 
     if (isLoadingProfile) {
@@ -101,13 +91,13 @@ const Profile = ({ uid }: ProfileProps) => {
             {/* Accordian Sections */}
             <div className="flex flex-col gap-5 px-4 xl:px-10">
                 <div>
-                    <GarageSection userId={currentUser?.uid} onVehicleClick={handleVehicleClick} />
+                    <GarageSection userId={currentUser?.uid} onVehicleClick={handleVehicleClick} isUserLoggedIn={isLoggedIn}  />
                 </div>
                 <div>
-                    <EventsSection eventIds={profileData?.eventAttendedIds} sectionTitle="Events Attended" />
+                    <EventsSection eventIds={profileData?.eventAttendedIds} sectionTitle="Events Attended" isUserLoggedIn={isLoggedIn} />
                 </div>
                 <div className="mb-10">
-                    <EventsSection eventIds={profileData?.eventHostedIds} sectionTitle="Events Hosted" />
+                    <EventsSection eventIds={profileData?.eventHostedIds} sectionTitle="Events Hosted" isUserLoggedIn={isLoggedIn}  />
                 </div>
             </div>
 

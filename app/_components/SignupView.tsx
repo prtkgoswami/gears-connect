@@ -4,8 +4,9 @@ import { faAsterisk, faCheck, faClose, faEye, faEyeSlash } from "@fortawesome/fr
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { useRegister } from "../hooks/authHooks";
-import Loader from "../_components/Loader";
+import Loader from "./Loader";
 import { CUSTOM_ERROR_CODES } from "../constants/errors";
+import { toast } from "react-toastify";
 
 type Requirement = {
     label: string;
@@ -134,10 +135,10 @@ const SignupView = ({ mode, isLoadingGoogleSignup, onClose, onRegisterSuccess, o
                 onError: (e: any) => {
                     console.error(e, e.code, e.message)
                     if (Object.values(CUSTOM_ERROR_CODES).includes(e.code)) {
-                        alert(e.message);
+                        toast.error(e.message);
                         return;
                     }
-                    alert("Failed to Register. Try Again!")
+                    toast.error("Failed to Register. Try Again!")
                 }
             }
         )

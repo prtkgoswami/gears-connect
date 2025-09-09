@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { ToastContainer } from "react-toastify";
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { APP_NAME } from "./constants/variables";
@@ -43,6 +43,7 @@ export default function RootLayout({
               {children}
             </div>
             <Footer />
+            <ToastContainer />
           </div>
         </ReactQueryProvider>
       </body>

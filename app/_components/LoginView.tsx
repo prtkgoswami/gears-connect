@@ -4,8 +4,9 @@ import { faAsterisk, faClose, faEye, faEyeSlash } from "@fortawesome/free-solid-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { useLogin } from "../hooks/authHooks";
-import Loader from "../_components/Loader";
+import Loader from "./Loader";
 import { CUSTOM_ERROR_CODES } from "../constants/errors";
+import { toast } from "react-toastify";
 
 type LoginViewProps = {
     mode: string;
@@ -68,10 +69,10 @@ const LoginView = ({ mode, isLoadingGoogleLogin, onClose, onLoginSuccess, onForg
                 onError: (e: any) => {
                     console.error(e, e.code, e.message)
                     if (Object.values(CUSTOM_ERROR_CODES).includes(e.code)) {
-                        alert(e.message);
+                        toast.error(e.message);
                         return;
                     }
-                    alert("Failed to Logged In. Try Again!")
+                    toast.error("Failed to Logged In. Try Again!")
                 }
             }
         )

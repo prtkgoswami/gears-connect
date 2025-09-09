@@ -9,6 +9,7 @@ import { VEHICLE_TYPES } from "../constants/variables";
 import { useCreateMeetup, useUpdateMeetup } from "../hooks/meetupHooks";
 import { formatDateTimeLocal } from "./utils";
 import Loader from "../_components/Loader";
+import { toast } from "react-toastify";
 
 type MeetupFormProps = {
     isVisible: boolean;
@@ -107,7 +108,7 @@ const MeetupForm = ({ isVisible, currentUser, initialValues, operation = "create
                         onClose();
                     },
                     onError: (err) => {
-                        alert("Failed to Create Meetup. Try again!")
+                        toast.error("Failed to Create Meetup. Try again!")
                     }
                 }
             );

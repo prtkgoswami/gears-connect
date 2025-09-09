@@ -19,6 +19,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { UserProfile } from "../../types/models";
 import { createUser } from "./userUtils";
 import { CUSTOM_ERROR_CODES } from "@/app/constants/errors";
+import { toast } from "react-toastify";
 
 const checkIfUserRegistered = async (email: string) => {
   try {
@@ -147,7 +148,7 @@ export const handleGoogleLogin = async (
     if (error.code === "auth/popup-closed-by-user") {
       console.log("User closed the popup");
     } else {
-      alert(`Login failed: ${error.message}`);
+      toast.error(`Login failed: ${error.message}`);
     }
     return null;
   }

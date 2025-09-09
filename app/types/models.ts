@@ -59,7 +59,7 @@ export type Venue = {
   pincode: string;
 };
 
-export type Meetup = {
+export type MeetupPublic = {
   id: string;
   title: string;
   description: string;
@@ -75,5 +75,9 @@ export type Meetup = {
   updatedAt: number;
   tags: string[];
   vehicleTypes: string[];
+  participantCount?: number;
+}
+
+export type Meetup = MeetupPublic & {
   participants: Participant[];
 };

@@ -4,7 +4,7 @@ import { faCar, faFlagCheckered, faUsers, faCalendarAlt, faMapMarkerAlt, faStar,
 import { faUser, faHeart } from "@fortawesome/free-regular-svg-icons";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AuthModal from "./AuthModal";
+import AuthModal from "../_components/AuthModal";
 import { APP_NAME } from "../constants/variables";
 import { handleRedirectResult } from "../services/firebase/authUtils";
 import { ROUTES } from "../constants/path";

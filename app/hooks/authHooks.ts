@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { User, getAuth, onIdTokenChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import {
   forgotPassword,
@@ -8,14 +8,17 @@ import {
   updateUserPassword,
 } from "../services/firebase/authUtils";
 import { useEffect, useState } from "react";
+import { app } from "@/app/lib/firebase";
 
-export const useAuth = () => {
+export function useAuth() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    const auth = getAuth(app);
+
+    const unsubscribe = onIdTokenChanged(auth, (firebaseUser) => {
+      setCurrentUser(firebaseUser);
       setIsLoading(false);
     });
 
@@ -27,7 +30,8 @@ export const useAuth = () => {
     isLoading,
     isLoggedIn: !!currentUser,
   };
-};
+}
+
 
 export const useRegister = () => {
   return useMutation({
