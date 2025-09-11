@@ -5,7 +5,6 @@ import { faCoins, faCalendarPlus, faDownload, faUserGroup, faTrash, faPen, faLoc
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { downloadICSFile, formatDisplayDate, generateGoogleCalendarLink, generateOutlookCalendarLink, generateYahooCalendarLink } from "../utils";
 import ChooseRideModal from "../ChooseRideModal";
-import { User } from "firebase/auth";
 import Link from "next/link";
 import { ROUTES } from "../../constants/path";
 import { useDeleteMeetup, useFetchMeetup } from "../../hooks/meetupHooks";
@@ -32,7 +31,6 @@ const MeetupDetailPage = ({ params }: MeetupDetailPageProps) => {
     const { mutate: deleteMeetup, isPending: isPendingDelete } = useDeleteMeetup()
     const { currentUser, isLoggedIn } = useAuth();
     const router = useRouter();
-    console.log('meetup details', meetup)
 
     const handleAttendClick = () => {
         setShowChooseVehicleModal(true);
@@ -78,6 +76,10 @@ const MeetupDetailPage = ({ params }: MeetupDetailPageProps) => {
             return <div role="button" className={`bg-gray-200/80 text-gray-800 rounded-lg py-2 px-5 cursor-not-allowed transition-colors duration-150 ease-in-out hover:bg-gray-300/100 ${classes}`}>Event is Full</div>
         }
         return <div role="button" className={`bg-amber-400 text-gray-800 rounded-lg py-2 px-5 cursor-pointer transition-colors duration-150 ease-in-out hover:bg-amber-500 ${classes}`} onClick={handleAttendClick}>Attend</div>
+    }
+
+    if (isLoading) {
+        return <Loader message="Loading Meetup Details" />
     }
 
     if (!meetup) {
@@ -174,9 +176,10 @@ const MeetupDetailPage = ({ params }: MeetupDetailPageProps) => {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <div className="text-lg font-semibold xl:text-2xl xl:font-normal">Eligible Vehicles</div>
-                                        {vehicleTypes.map((type, typeIdx) =>
+                                        {/* {vehicleTypes.map((type, typeIdx) =>
                                             <div className=" text-gray-200 capitalize" key={typeIdx}>{type}</div>
-                                        )}
+                                        )} */}
+                                        <div className=" text-gray-200 capitalize">{vehicleTypes.join(', ')}</div>
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <div className="text-lg font-semibold xl:text-2xl xl:font-normal">Rules</div>
@@ -194,37 +197,38 @@ const MeetupDetailPage = ({ params }: MeetupDetailPageProps) => {
                                                     href={generateGoogleCalendarLink(meetup)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-150 text-sm"
+                                                    className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-900 text-gray-200 border border-slate-900 hover:border-amber-300 cursor-pointer transition-colors duration-200 text-sm"
                                                 >
-                                                    <FontAwesomeIcon icon={faCalendarPlus} />
+                                                    <FontAwesomeIcon icon={faCalendarPlus} className="text-red-400" />
                                                     Google Calendar
                                                 </a>
                                                 <a
                                                     href={generateOutlookCalendarLink(meetup)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 px-3 py-1 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors duration-150 text-sm"
+                                                    className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-900 text-gray-200 border border-slate-900 hover:border-amber-300 cursor-pointer transition-colors duration-200 text-sm"
                                                 >
-                                                    <FontAwesomeIcon icon={faCalendarPlus} />
+                                                    <FontAwesomeIcon icon={faCalendarPlus} className="text-sky-400" />
                                                     Outlook
                                                 </a>
                                                 <a
                                                     href={generateYahooCalendarLink(meetup)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 px-3 py-1 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-150 text-sm"
+                                                    className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-900 text-gray-200 border border-slate-900 hover:border-amber-300 cursor-pointer transition-colors duration-200 text-sm"
                                                 >
-                                                    <FontAwesomeIcon icon={faCalendarPlus} />
+                                                    <FontAwesomeIcon icon={faCalendarPlus} className="text-purple-400" />
                                                     Yahoo Calendar
                                                 </a>
                                                 <button
                                                     onClick={() => downloadICSFile(meetup)}
-                                                    className="flex items-center gap-2 px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-150 text-sm"
+                                                    className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-900 text-gray-200 border border-slate-900 hover:border-amber-300 cursor-pointer transition-colors duration-200 text-sm"
                                                 >
-                                                    <FontAwesomeIcon icon={faDownload} />
+                                                    <FontAwesomeIcon icon={faDownload} className="text-green-400" />
                                                     Download ICS
                                                 </button>
                                             </div>
+
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-1 mb-5 xl:mb-0">

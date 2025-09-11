@@ -12,7 +12,11 @@ import {
 import { Meetup, MeetupPublic } from "@/app/types/models";
 import { adminAuth } from "@/app/lib/firebaseAdmin";
 
-const formatMeetup = (data: Omit<Meetup, "id">, id: string, isAuthenticated: boolean): Meetup | MeetupPublic => {
+const formatMeetup = (
+  data: Omit<Meetup, "id">,
+  id: string,
+  isAuthenticated: boolean
+): Meetup | MeetupPublic => {
   if (isAuthenticated) {
     return { id, ...data };
   }
@@ -33,23 +37,29 @@ const formatMeetup = (data: Omit<Meetup, "id">, id: string, isAuthenticated: boo
     participationLimit: data.participationLimit,
     isPrivate: data.isPrivate,
     createdAt: data.createdAt,
-    updatedAt: data.updatedAt
+    updatedAt: data.updatedAt,
   };
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { ids: string } }
+  { params }: { params: Promise<{ ids: string }> },
 ) {
-  let isAuthenticated = false;
+  const ids = (await params).ids;
+  if (!ids) {
+    return NextResponse.json(
+      { error: "Missing ids parameter" },
+      { status: 400 }
+    );
+  }
 
-  // 🔐 verify Firebase ID token if provided
+  let isAuthenticated = false;
   try {
     const authHeader = req.headers.get("authorization");
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.split("Bearer ")[1];
       if (token) {
-        await adminAuth.verifyIdToken(token); // ✅ always available
+        await adminAuth.verifyIdToken(token);
         isAuthenticated = true;
       }
     }
@@ -58,7 +68,6 @@ export async function GET(
   }
 
   try {
-    const { ids } = await params;
     const idList = ids.split(",");
     let meetups: (Meetup | MeetupPublic)[] = [];
 
@@ -83,13 +92,12 @@ export async function GET(
         meetups.push(
           ...snaps.docs.map((doc) => {
             const docData = doc.data() as Omit<Meetup, "id">;
-            return formatMeetup(docData, doc.id, isAuthenticated)
+            return formatMeetup(docData, doc.id, isAuthenticated);
           })
         );
       }
       return NextResponse.json(meetups, { status: 200 });
     }
-
   } catch (err) {
     console.error("Failed to fetch meetups by IDs:", err);
     return NextResponse.json(

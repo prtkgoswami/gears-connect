@@ -45,7 +45,10 @@ const PreferencesPage = () => {
         <div className="w-full min-h-100 flex flex-col gap-5 items-center mb-10">
             <TitleText title="Preferences" />
 
-            <EditProfileForm userId={userId} profileData={profileData} isLoadingUserData={isLoadingUserData} />
+            {isLoadingUserData ?
+                <Loader message="Fetching User Profile" size="5x" /> :
+                <EditProfileForm userId={userId} profileData={profileData} />
+            }
 
 
             <div className="flex flex-col gap-2 w-full xl:w-1/2 px-5 lg:px-0">

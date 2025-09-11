@@ -16,7 +16,7 @@ const ICON_CLASSES = "text-xl hover:text-amber-300 hover:scale-110 transition-al
 const Header = () => {
     const router = useRouter();
     const pathname = usePathname();
-    const { currentUser, isLoggedIn } = useAuth();
+    const { currentUser, isLoggedIn, isLoading: isLoadingAuth } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -78,36 +78,38 @@ const Header = () => {
         <>
             <header className="w-full flex justify-between items-center xl:items-end px-4 xl:px-8 py-5">
                 <p className="text-xl xl:text-2xl text-gray-50 select-none cursor-pointer transition-colors duration-200 ease-in-out hover:text-amber-300" onClick={() => router.push(ROUTES.root)}>{APP_NAME}</p>
-                <div className="relative min-w-10">
-                    {isLoggedIn ?
-                        <>
-                            {/* Hamburger Menu */}
-                            <button className="xl:hidden text-xl text-amber-300 cursor-pointer border rounded-lg w-8 aspect-square flex justify-center items-center" onClick={() => setIsMenuOpen(true)}>
-                                <FontAwesomeIcon icon={faBars} />
-                            </button>
-                            {/* Menu */}
-                            <div className="hidden xl:flex items-center gap-x-8">
-                                <div className={`${ICON_CLASSES} ${pathname === ROUTES.garage ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handleGarageClick}>
-                                    <FontAwesomeIcon icon={faCar} />
+                {!isLoadingAuth &&
+                    <div className="relative min-w-10">
+                        {isLoggedIn ?
+                            <>
+                                {/* Hamburger Menu */}
+                                <button className="xl:hidden text-xl text-amber-300 cursor-pointer border rounded-lg w-8 aspect-square flex justify-center items-center" onClick={() => setIsMenuOpen(true)}>
+                                    <FontAwesomeIcon icon={faBars} />
+                                </button>
+                                {/* Menu */}
+                                <div className="hidden xl:flex items-center gap-x-8">
+                                    <div className={`${ICON_CLASSES} ${pathname === ROUTES.garage ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handleGarageClick}>
+                                        <FontAwesomeIcon icon={faCar} />
+                                    </div>
+                                    <div className={`${ICON_CLASSES} ${pathname === ROUTES.meetups ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handleMeetupClick}>
+                                        <FontAwesomeIcon icon={faFlagCheckered} />
+                                    </div>
+                                    <div className={`${ICON_CLASSES} ${pathname.includes(ROUTES.profile) ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handleProfileClick}>
+                                        <FontAwesomeIcon icon={faUser} />
+                                    </div>
+                                    <div className={`${ICON_CLASSES} ${pathname === (ROUTES.preferences) ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handlePreferencesClick}>
+                                        <FontAwesomeIcon icon={faGear} />
+                                    </div>
+                                    <div className={ICON_CLASSES} onClick={handleSignOut}>
+                                        <FontAwesomeIcon icon={faRightFromBracket} />
+                                    </div>
                                 </div>
-                                <div className={`${ICON_CLASSES} ${pathname === ROUTES.meetups ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handleMeetupClick}>
-                                    <FontAwesomeIcon icon={faFlagCheckered} />
-                                </div>
-                                <div className={`${ICON_CLASSES} ${pathname.includes(ROUTES.profile) ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handleProfileClick}>
-                                    <FontAwesomeIcon icon={faUser} />
-                                </div>
-                                <div className={`${ICON_CLASSES} ${pathname === (ROUTES.preferences) ? 'text-amber-300' : 'text-gray-50/50'}`} onClick={handlePreferencesClick}>
-                                    <FontAwesomeIcon icon={faGear} />
-                                </div>
-                                <div className={ICON_CLASSES} onClick={handleSignOut}>
-                                    <FontAwesomeIcon icon={faRightFromBracket} />
-                                </div>
-                            </div>
-                        </> :
-                        <button className="text-sm xl:text-base cursor-pointer py-2 px-3 text-gray-800 bg-amber-400 transition-colors duration-200 ease-in-out hover:bg-amber-500 font-semibold rounded-lg" onClick={handleRegisterClick}>
-                            Register Now
-                        </button>}
-                </div>
+                            </> :
+                            <button className="text-sm xl:text-base cursor-pointer py-2 px-3 text-gray-800 bg-amber-400 transition-colors duration-200 ease-in-out hover:bg-amber-500 font-semibold rounded-lg" onClick={handleRegisterClick}>
+                                Register Now
+                            </button>}
+                    </div>
+                }
                 {(isMenuOpen || isAnimating) &&
                     <div className={`fixed inset-0 bg-amber-300 z-[999] flex flex-col items-center justify-start text-gray-900 origin-top ${isMenuOpen && !isAnimating ? "animate-slideDown" : "animate-slideUp"}`}>
                         <div className="flex w-full px-6 py-5 justify-end">

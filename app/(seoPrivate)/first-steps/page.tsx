@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ROUTES } from "../../constants/path";
 import { useAuth } from "../../hooks/authHooks";
 import Loader from "../../_components/Loader";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { UserProfile } from "../../types/models";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -14,8 +14,8 @@ import { APP_NAME } from "../../constants/variables";
 import { useUpdateUser } from "../../hooks/userHooks";
 import { toast } from "react-toastify";
 
-const FirstSteps = () => {
-    const { isLoading: isAuthLoading, currentUser, isLoggedIn } = useAuth();
+const FirstStepsInner = () => {
+const { isLoading: isAuthLoading, currentUser, isLoggedIn } = useAuth();
     const [userData, setUserData] = useState<UserProfile>();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -201,6 +201,14 @@ const FirstSteps = () => {
                 </div>
             }
         </div>
+    )
+}
+
+const FirstSteps = () => {
+    return (
+        <Suspense fallback={<Loader message="Loading First Steps" />}>
+            <FirstStepsInner />
+        </Suspense>
     )
 }
 

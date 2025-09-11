@@ -8,12 +8,11 @@ import { faClose, faPen, faSave } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 
 type EditProfileFormProps = {
-    isLoadingUserData: boolean;
     profileData?: UserProfile;
     userId?: string;
 }
 
-const EditProfileForm = ({ userId, profileData, isLoadingUserData }: EditProfileFormProps) => {
+const EditProfileForm = ({ userId, profileData }: EditProfileFormProps) => {
     const [inEditMode, setInEditMode] = useState(false)
     const [formData, setFormData] = useState<Partial<UserProfile>>()
     const { mutate: updateUser, isPending: isPendingUserUpdate } = useUpdateUser();
@@ -75,11 +74,6 @@ const EditProfileForm = ({ userId, profileData, isLoadingUserData }: EditProfile
         return <></>
     }
 
-    if (isLoadingUserData && !profileData) {
-        return <Loader message="Loading User Profile" />
-    }
-
-
     const hasChanges = JSON.stringify(profileData) !== JSON.stringify(formData)
 
     return (
@@ -109,10 +103,11 @@ const EditProfileForm = ({ userId, profileData, isLoadingUserData }: EditProfile
                     </div>
                     :
                     <button
-                        className="w-10 lg:w-8 aspect-square rounded-full cursor-pointer transition-colors duration-200 ease-in-out text-gray-800 bg-amber-300 hover:bg-amber-400"
+                        className="w-10 lg:w-8 aspect-square rounded-full cursor-pointer transition-colors duration-200 ease-in-out text-gray-800 bg-amber-300 hover:bg-amber-400 disabled:bg-gray-200"
                         onClick={() => {
                             setInEditMode(true);
-                        }}>
+                        }}
+                    >
                         <FontAwesomeIcon icon={faPen} />
                     </button>
                 }

@@ -21,7 +21,6 @@ const Meetups = () => {
   const { currentUser } = useAuth();
   const router = useRouter();
   const { data: vehicleData, isLoading: isLoadingVehicles } = useFetchVehicles(currentUser?.uid)
-  console.log('meetups', meetupList, currentUser)
 
   // Filters
   const [activeType, setActiveType] = useState('all')
@@ -50,8 +49,9 @@ const Meetups = () => {
     setActiveEligibleOnly(false)
   }
 
+
   const renderMeetupList = () => {
-    if (isLoadingMeetupList && isLoadingVehicles) {
+    if (isLoadingMeetupList || isLoadingVehicles) {
       return (
         <Loader message="Fetching Meetups" />
       )

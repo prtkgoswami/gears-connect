@@ -8,6 +8,7 @@ import AuthModal from "../_components/AuthModal";
 import { APP_NAME } from "../constants/variables";
 import { handleRedirectResult } from "../services/firebase/authUtils";
 import { ROUTES } from "../constants/path";
+import Image from "next/image";
 
 const Homepage = () => {
     const router = useRouter();
@@ -49,8 +50,11 @@ const Homepage = () => {
 
                     <div className="relative z-10 text-center px-8 max-w-6xl mx-auto">
                         <div className="xl:hidden flex justify-center mb-8 mt-15">
-                            <div className="border-2 rounded-xl px-5 pt-18 pb-3 w-3/4">
-                                <div className="flex justify-center text-slate-50/90 text-9xl mb-8"><FontAwesomeIcon icon={faGears} /></div>
+                            <div className="border-2 rounded-xl px-5 pt-5 pb-3 w-3/4">
+                                <div className="flex justify-center text-slate-50/90 text-9xl mb-2 w-full relative h-40">
+                                {/* <FontAwesomeIcon icon={faGears} /> */}
+                                <Image alt="Gears Connect Icon" src="/images/GC_Icon.png" fill className="object-contain" />
+                                </div>
                                 <p className="text-2xl font-mono font-bold text-slate-50/90 tracking-wider select-none">
                                     {APP_NAME}
                                 </p>

@@ -15,13 +15,18 @@ import { fetchMeetup, fetchMeetupList, fetchMeetups } from "../lib/api";
 import { useAuth } from "@/app/hooks/authHooks";
 
 export const useFetchMeetups = () => {
-  const { isLoading } = useAuth();
+  const { isLoading: isAuthLoading } = useAuth();
 
-  return useQuery<Meetup[]>({
+  const query =  useQuery<Meetup[]>({
     queryKey: ["meetups"],
     queryFn: fetchMeetups,
-    enabled: !isLoading, // wait for Firebase auth
+    enabled: !isAuthLoading, // wait for Firebase auth
   });
+  
+  return {
+    ...query,
+    isLoading: isAuthLoading || query.isLoading || query.status === 'pending',
+  };
 };
 
 export const useFetchMeetupList = (meetupIds: string[]) => {
@@ -43,19 +48,19 @@ export const useFetchMeetupList = (meetupIds: string[]) => {
 };
 
 export const useFetchMeetup = (meetupId: string) => {
-  const { isLoading } = useAuth();
+  const { isLoading: isAuthLoading } = useAuth();
   const queryClient = useQueryClient();
 
-  return useQuery<Meetup>({
+  const query = useQuery<Meetup>({
     queryKey: ["meetups", meetupId],
     queryFn: () => fetchMeetup(meetupId),
-    enabled: !isLoading && !!meetupId, // wait + ensure id exists
-    // initialData: () => {
-    //   return  queryClient
-    //     .getQueryData<Meetup[]>(["meetups"])
-    //     ?.find((m) => m.id === meetupId);
-    // },
+    enabled: !isAuthLoading && !!meetupId, // wait + ensure id exists
   });
+
+  return {
+    ...query,
+    isLoading: isAuthLoading || query.isLoading
+  }
 };
 
 

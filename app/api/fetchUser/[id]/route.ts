@@ -34,7 +34,7 @@ const formatUserProfile = (
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   let isAuthenticated = false;
 
@@ -55,7 +55,7 @@ export async function GET(
   }
 
   try {
-    const { id } = params;
+    const id = (await params).id;
     const snap = await getDoc(doc(db, "users", id));
 
     if (!snap.exists() || !snap.data()) {
